@@ -37,7 +37,7 @@ def analyze_resume():
             
         job_description = request.form['job_description']
         if not job_description.strip():
-             return jsonify({"error": "Job description cannot be empty"}), 400
+            return jsonify({"error": "Job description cannot be empty"}), 400
 
         resume_text = ""
         
@@ -57,14 +57,15 @@ def analyze_resume():
                 else:
                     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                         resume_text = f.read()
+
                 os.remove(filepath)
             else:
-                 return jsonify({"error": "Invalid file type. Please upload PDF or TXT."}), 400
+                return jsonify({"error": "Invalid file type. Please upload PDF or TXT."}), 400
         else:
-             return jsonify({"error": "Please provide either resume_text or upload a resume_file"}), 400
+            return jsonify({"error": "Provide resume_text or upload resume_file"}), 400
 
         if not resume_text.strip():
-             return jsonify({"error": "Could not extract text from the resume"}), 400
+            return jsonify({"error": "Could not extract text from resume"}), 400
 
         processed_resume = preprocess_for_tfidf(resume_text)
         processed_jd = preprocess_for_tfidf(job_description)
@@ -72,14 +73,20 @@ def analyze_resume():
         gap_analysis = analyze_gap(resume_text, job_description)
 
         scores = calculate_multi_dimensional_scores(
-            processed_resume, processed_jd, 
-            gap_analysis['skills_found'], gap_analysis['jd_skills']
+            processed_resume,
+            processed_jd,
+            gap_analysis['skills_found'],
+            gap_analysis['jd_skills']
         )
 
-        suggestions = generate_suggestions(gap_analysis['missing_skills'], gap_analysis['critical_missing_skills'])
+        suggestions = generate_suggestions(
+            gap_analysis['missing_skills'],
+            gap_analysis['critical_missing_skills']
+        )
+
         resume_feedback = analyze_resume_quality(resume_text)
 
-        response = {
+        return jsonify({
             "match_score": scores['final_score'],
             "skill_score": scores['skill_score'],
             "similarity_score": scores['similarity_score'],
@@ -88,13 +95,14 @@ def analyze_resume():
             "critical_missing_skills": gap_analysis["critical_missing_skills"],
             "suggestions": suggestions,
             "resume_feedback": resume_feedback
-        }
+        })
 
-        return jsonify(response)
-        
     except Exception as e:
-        logger.error(f"Error during analysis: {str(e)}", exc_info=True)
-        return jsonify({"error": f"An internal server error occurred: {str(e)}"}), 500
+        logger.error(f"Error: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
+
+# 🔥 IMPORTANT CHANGE (DEPLOYMENT FIX)
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
