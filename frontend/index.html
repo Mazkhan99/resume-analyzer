@@ -3,104 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Resume Analyzer</title>
+    <title>AI Resume Matcher</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <div class="background-animation"></div>
-    <div class="container">
-        <header>
-            <h1>AI Resume <span>Analyzer</span></h1>
-            <p>Advanced NLP Matching and Resume Quality Insights.</p>
-        </header>
+    <div class="background-mesh"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass">
+            <div class="brand">
+                <i data-lucide="layers"></i>
+                <span>Resume AI</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-tab="single-analysis">
+                    <i data-lucide="file-search"></i>
+                    Single Analysis
+                </li>
+                <li class="nav-item" data-tab="multi-compare">
+                    <i data-lucide="copy-check"></i>
+                    Multi Compare
+                </li>
+            </ul>
+        </nav>
 
-        <main>
-            <div class="input-section glass-panel">
-                <form id="analyzer-form">
-                    <div class="form-group">
-                        <label for="resume-file">Upload Resume (PDF/TXT)</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" id="resume-file" name="resume_file" accept=".pdf,.txt" class="file-input">
-                            <div class="file-upload-design">
-                                <span id="file-name">Choose a file or drag it here</span>
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- SINGLE ANALYSIS TAB -->
+            <section id="single-analysis" class="tab-pane active">
+                <header class="section-header">
+                    <h1>Single Analysis</h1>
+                    <p>Deep match your resume against a specific job description.</p>
+                </header>
+
+                <div class="input-panel glass">
+                    <form id="analyze-form">
+                        <div class="form-group">
+                            <label>Resume (PDF or Text)</label>
+                            <div class="file-drop-area" id="file-drop-area">
+                                <input type="file" id="resume-file" name="resume_file" accept=".pdf,.txt">
+                                <i data-lucide="upload-cloud"></i>
+                                <span class="file-msg">Click or drag file to upload</span>
+                            </div>
+                            <div class="divider"><span>OR PASTE TEXT</span></div>
+                            <textarea id="resume-text" name="resume_text" rows="3" placeholder="Paste your resume here..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Job Description *</label>
+                            <textarea id="job-desc" name="job_description" rows="4" placeholder="Paste the job requirements..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" id="analyze-btn">
+                            <span class="btn-text">Analyze Match</span>
+                            <div class="loader"></div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results Panel -->
+                <div id="results-panel" class="results-panel hidden">
+                    <div class="dashboard-grid">
+                        <!-- Score Card -->
+                        <div class="card glass score-card">
+                            <h3>Match Potential</h3>
+                            <div class="circular-chart">
+                                <svg viewBox="0 0 36 36" class="circular-chart-svg">
+                                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                  <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="percentage">0%</div>
+                            </div>
+                            <div class="sub-scores">
+                                <div class="sub-score">
+                                    <span class="label">Skills Match</span>
+                                    <div class="bar-bg"><div class="bar-fill" id="bar-skill"></div></div>
+                                    <span class="val" id="val-skill">0%</span>
+                                </div>
+                                <div class="sub-score">
+                                    <span class="label">Text Similarity</span>
+                                    <div class="bar-bg"><div class="bar-fill" id="bar-sim"></div></div>
+                                    <span class="val" id="val-sim">0%</span>
+                                </div>
                             </div>
                         </div>
-                        <p class="or-text">OR paste your resume text below:</p>
-                        <textarea id="resume-text" name="resume_text" rows="4" placeholder="Paste your resume text here..."></textarea>
+
+                        <!-- Skills Gaps Card -->
+                        <div class="card glass skills-card">
+                            <h3>Skill Analysis</h3>
+                            
+                            <div class="skill-group">
+                                <h4>Critical Missing Skills</h4>
+                                <div class="chip-container" id="chips-critical"></div>
+                            </div>
+                            
+                            <div class="skill-group">
+                                <h4>Other Missing Skills</h4>
+                                <div class="chip-container" id="chips-missing"></div>
+                            </div>
+
+                            <div class="skill-group">
+                                <h4>Skills Matched</h4>
+                                <div class="chip-container" id="chips-found"></div>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Feedback & Suggestions -->
+                    <div class="feedback-section">
+                        <div class="card glass">
+                            <h3><i data-lucide="lightbulb"></i> Actionable Suggestions</h3>
+                            <ul class="styled-list" id="list-suggestions"></ul>
+                        </div>
+                        <div class="card glass">
+                            <h3><i data-lucide="check-circle"></i> Resume Quality Feedback</h3>
+                            <div class="feedback-box">
+                                <h4 class="text-error">Issues Detected</h4>
+                                <ul class="styled-list" id="list-issues"></ul>
+                            </div>
+                            <div class="feedback-box mt-4">
+                                <h4 class="text-success">Recommendations</h4>
+                                <ul class="styled-list" id="list-rec"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MULTI COMPARE TAB -->
+            <section id="multi-compare" class="tab-pane hidden">
+                <header class="section-header">
+                    <h1>Multi-Job Compare</h1>
+                    <p>Compare one resume against multiple roles to find the best fit.</p>
+                </header>
+
+                <div class="input-panel glass">
                     <div class="form-group">
-                        <label for="job-description">Job Description *</label>
-                        <textarea id="job-description" name="job_description" rows="6" placeholder="Paste the target job description here..." required></textarea>
+                        <label>Base Resume Text *</label>
+                        <textarea id="multi-resume" rows="3" placeholder="Paste your resume text..." required></textarea>
                     </div>
-
-                    <button type="submit" id="submit-btn" class="primary-btn">
-                        <span>Analyze Match</span>
-                        <div class="spinner" id="btn-spinner"></div>
-                    </button>
-                </form>
-            </div>
-
-            <div class="results-section hidden" id="results-panel">
-                
-                <div class="score-dashboard">
-                    <div class="main-score glass-panel">
-                        <h2>Final Match Score</h2>
-                        <div class="circular-progress" id="score-circle">
-                            <span class="progress-value" id="score-text">0%</span>
+                    
+                    <div class="jobs-list" id="jobs-container">
+                        <div class="job-item glass-light">
+                            <input type="text" class="job-title-input" placeholder="Job Title (e.g. Frontend Dev)" required>
+                            <textarea class="job-desc-input" rows="2" placeholder="Job description..." required></textarea>
+                            <button class="icon-btn text-error remove-job hidden"><i data-lucide="trash-2"></i></button>
                         </div>
                     </div>
                     
-                    <div class="sub-scores glass-panel">
-                        <h2>Dimensions</h2>
-                        <div class="progress-bar-container">
-                            <div class="pb-header"><span>Skill Match Score</span> <span id="val-skill">0%</span></div>
-                            <div class="pb-track"><div class="pb-fill fill-accent" id="bar-skill" style="width: 0%"></div></div>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="pb-header"><span>Text Similarity Score</span> <span id="val-keyword">0%</span></div>
-                            <div class="pb-track"><div class="pb-fill fill-success" id="bar-keyword" style="width: 0%"></div></div>
-                        </div>
-                    </div>
+                    <button class="btn-secondary mt-3" id="add-job-btn"><i data-lucide="plus"></i> Add Job</button>
+
+                    <button class="btn-primary mt-4" id="compare-btn">
+                        <span class="btn-text">Run Comparison</span>
+                        <div class="loader"></div>
+                    </button>
                 </div>
 
-                <div class="grid-2">
-                    <div class="glass-panel">
-                        <h3>⚠️ Skill Gaps</h3>
-                        <div class="tags-container" id="critical-skills-container"></div>
-                        <div class="tags-container mt-2" id="missing-skills-container"></div>
-                    </div>
-                    <div class="glass-panel">
-                        <h3>✅ Skills Found</h3>
-                        <div class="tags-container" id="found-skills-container"></div>
+                <!-- Multi Results -->
+                <div id="multi-results" class="multi-results hidden">
+                    <h3>Comparison Rankings</h3>
+                    <div class="comparison-grid" id="compare-grid">
+                        <!-- Cards injected here -->
                     </div>
                 </div>
+            </section>
 
-                <div class="glass-panel">
-                    <h3>💡 Intelligent Suggestions</h3>
-                    <ul id="suggestions-list" class="styled-list"></ul>
-                </div>
-
-                <div class="glass-panel quality-feedback">
-                    <h3>📊 Resume Quality Feedback</h3>
-                    <div class="feedback-grid">
-                        <div class="feedback-box issues">
-                            <h4>Issues Detected</h4>
-                            <ul id="feedback-issues"></ul>
-                        </div>
-                        <div class="feedback-box recommendations">
-                            <h4>Recommendations</h4>
-                            <ul id="feedback-rec"></ul>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            
-            <div id="error-message" class="error-toast hidden"></div>
         </main>
     </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Message</div>
+
     <script src="script.js"></script>
 </body>
 </html>
