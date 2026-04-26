@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <header>
+            <h1>AI Resume <span>Analyzer</span></h1>
+            <p>Advanced NLP Matching and Resume Quality Insights.</p>
+        </header>
+
+        <main>
+            <div class="input-section glass-panel">
+                <form id="analyzer-form">
+                    <div class="form-group">
+                        <label for="resume-file">Upload Resume (PDF/TXT)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="resume-file" name="resume_file" accept=".pdf,.txt" class="file-input">
+                            <div class="file-upload-design">
+                                <span id="file-name">Choose a file or drag it here</span>
+                            </div>
+                        </div>
+                        <p class="or-text">OR paste your resume text below:</p>
+                        <textarea id="resume-text" name="resume_text" rows="4" placeholder="Paste your resume text here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-description">Job Description *</label>
+                        <textarea id="job-description" name="job_description" rows="6" placeholder="Paste the target job description here..." required></textarea>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="primary-btn">
+                        <span>Analyze Match</span>
+                        <div class="spinner" id="btn-spinner"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="results-section hidden" id="results-panel">
+                
+                <div class="score-dashboard">
+                    <div class="main-score glass-panel">
+                        <h2>Final Match Score</h2>
+                        <div class="circular-progress" id="score-circle">
+                            <span class="progress-value" id="score-text">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-scores glass-panel">
+                        <h2>Dimensions</h2>
+                        <div class="progress-bar-container">
+                            <div class="pb-header"><span>Skill Match Score</span> <span id="val-skill">0%</span></div>
+                            <div class="pb-track"><div class="pb-fill fill-accent" id="bar-skill" style="width: 0%"></div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="pb-header"><span>Text Similarity Score</span> <span id="val-keyword">0%</span></div>
+                            <div class="pb-track"><div class="pb-fill fill-success" id="bar-keyword" style="width: 0%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-panel">
+                        <h3>⚠️ Skill Gaps</h3>
+                        <div class="tags-container" id="critical-skills-container"></div>
+                        <div class="tags-container mt-2" id="missing-skills-container"></div>
+                    </div>
+                    <div class="glass-panel">
+                        <h3>✅ Skills Found</h3>
+                        <div class="tags-container" id="found-skills-container"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <h3>💡 Intelligent Suggestions</h3>
+                    <ul id="suggestions-list" class="styled-list"></ul>
+                </div>
+
+                <div class="glass-panel quality-feedback">
+                    <h3>📊 Resume Quality Feedback</h3>
+                    <div class="feedback-grid">
+                        <div class="feedback-box issues">
+                            <h4>Issues Detected</h4>
+                            <ul id="feedback-issues"></ul>
+                        </div>
+                        <div class="feedback-box recommendations">
+                            <h4>Recommendations</h4>
+                            <ul id="feedback-rec"></ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div id="error-message" class="error-toast hidden"></div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
